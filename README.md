@@ -182,7 +182,3 @@ WinFormsCustomControls/WinFormsCustomControls/bin/Release/WinFormsCustomControls
 ```
 
 배포할 때는 이 DLL을 사용하는 WinForms 프로젝트에 참조로 추가하면 됩니다.
-
-## License
-
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
