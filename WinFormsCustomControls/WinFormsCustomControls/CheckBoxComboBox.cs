@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace WinFormsCustomControls
@@ -10,6 +9,7 @@ namespace WinFormsCustomControls
     {
         private readonly CheckBoxComboBoxDropdown dropdownPanel;
         private readonly ToolStripDropDown dropDown;
+        private bool isDropDownPending;
         public CheckBox[] GetItems => dropdownPanel.GetItems;
         private string sText;
         public CheckBoxComboBox()
@@ -41,6 +41,7 @@ namespace WinFormsCustomControls
             };
             dropDown.Closing += dropdown_Closing;
             dropDown.Items.Add(host);
+            components?.Add(dropDown);
         }
         private void DropdownPanel_CheckedChanged(object sender, EventArgs e)
         {
@@ -80,24 +81,39 @@ namespace WinFormsCustomControls
             UpdateText();
         }
 
-        protected async override void OnClick(EventArgs e)
+        protected override void OnClick(EventArgs e)
         {
-            this.SuspendLayout();
-            await Task.Delay(10);
+            if (isDropDownPending || dropDown.Visible || IsDisposed || Disposing || !IsHandleCreated)
+                return;
+
+            isDropDownPending = true;
+            BeginInvoke(new MethodInvoker(ShowCustomDropDown));
+        }
+        private void ShowCustomDropDown()
+        {
+            isDropDownPending = false;
+
+            if (dropDown.Visible || IsDisposed || Disposing || !IsHandleCreated)
+                return;
+
+            if (DroppedDown)
+                DroppedDown = false;
+
             dropDown.Show(this, new Point(0, this.Height));
-            dropdownPanel.Focus(); // 포커스를 패널로 줘서 외부 클릭 감지 유도
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            if (dropdownPanel.CanFocus)
+                dropdownPanel.Focus(); // 포커스를 패널로 줘서 외부 클릭 감지 유도
         }
         protected override void OnDrawItem(DrawItemEventArgs e)
         {
-            this.SuspendLayout();
             e.DrawBackground(); // 배경 그리기 추가
-            using (SolidBrush brush = new SolidBrush(e.ForeColor))
-                e.Graphics.DrawString(sText, e.Font, brush, e.Bounds);
+            TextRenderer.DrawText(
+                e.Graphics,
+                sText,
+                e.Font ?? Font,
+                e.Bounds,
+                e.ForeColor,
+                TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
 
-            this.ResumeLayout(false);
-            this.PerformLayout();
         }
     }
 }

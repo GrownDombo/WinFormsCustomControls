@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.btnMoreColor = new System.Windows.Forms.Button();
             this.flpBaseColors = new System.Windows.Forms.FlowLayoutPanel();
             this.btnColorRed = new System.Windows.Forms.Button();
@@ -38,6 +39,7 @@
             this.btnIndigo = new System.Windows.Forms.Button();
             this.btnViolet = new System.Windows.Forms.Button();
             this.colDigMoreCol = new System.Windows.Forms.ColorDialog();
+            this.components.Add(this.colDigMoreCol);
             this.flpBaseColors.SuspendLayout();
             this.SuspendLayout();
             // 

@@ -22,19 +22,36 @@ namespace WinFormsCustomControls
         protected override void OnControlAdded(ControlEventArgs e)
         {
             this.SuspendLayout();
-            e.Control.Width = this.Size.Width - MARGIN;
-            base.OnControlAdded(e);
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            try
+            {
+                SetChildWidth(e.Control);
+                base.OnControlAdded(e);
+            }
+            finally
+            {
+                this.ResumeLayout(false);
+                this.PerformLayout();
+            }
         }
         protected override void OnSizeChanged(EventArgs e)
         {
             this.SuspendLayout();
-            foreach (Control control in this.Controls)
-                control.Width = this.Size.Width - MARGIN;
-            base.OnSizeChanged(e);
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            try
+            {
+                foreach (Control control in this.Controls)
+                    SetChildWidth(control);
+                base.OnSizeChanged(e);
+            }
+            finally
+            {
+                this.ResumeLayout(false);
+                this.PerformLayout();
+            }
+        }
+        private void SetChildWidth(Control control)
+        {
+            if (control != null)
+                control.Width = Math.Max(0, this.ClientSize.Width - MARGIN);
         }
     }
 }

@@ -22,7 +22,8 @@ namespace WinFormsCustomControls
 
         private void btnColor_Click(object sender, EventArgs e)
         {
-            ColorSelected?.Invoke(this, new ColorSelectedEventArgs(((Button)sender).BackColor));
+            if (sender is Button button)
+                ColorSelected?.Invoke(this, new ColorSelectedEventArgs(button.BackColor));
         }
     }
     internal class ColorSelectedEventArgs : EventArgs

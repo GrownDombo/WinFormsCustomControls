@@ -1,4 +1,4 @@
-# WinFormsCustomControls
+﻿# WinFormsCustomControls
 
 [![Release](https://github.com/GrownDombo/WinFormsCustomControls/actions/workflows/release.yml/badge.svg)](https://github.com/GrownDombo/WinFormsCustomControls/actions/workflows/release.yml)
 

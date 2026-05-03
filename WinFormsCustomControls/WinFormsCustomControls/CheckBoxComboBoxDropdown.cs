@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace WinFormsCustomControls
@@ -23,9 +17,12 @@ namespace WinFormsCustomControls
         }
         internal void AddItem(string item, bool isChecked)
         {
+            if (item == null)
+                throw new ArgumentNullException(nameof(item));
+
             CheckBox checkBox = new CheckBox
             {
-                Name = $"cbx{item}",
+                Name = CreateCheckBoxName(vflpMain.Controls.Count),
                 Text = item,
                 AutoSize = true,
                 Checked = isChecked
@@ -36,13 +33,23 @@ namespace WinFormsCustomControls
         }
         internal void AddItemRange(string[] items)
         {
+            if (items == null)
+                throw new ArgumentNullException(nameof(items));
+
+            for (int i = 0; i < items.Length; i++)
+            {
+                if (items[i] == null)
+                    throw new ArgumentException("Items cannot contain null values.", nameof(items));
+            }
+
             CheckBox[] arrCheckBox = new CheckBox[items.Length];
+            int startIndex = vflpMain.Controls.Count;
             for (int i = 0; i < items.Length; i++)
             {
                 string sText = items[i];
                 CheckBox checkBox = new CheckBox
                 {
-                    Name = $"cbx{sText}",
+                    Name = CreateCheckBoxName(startIndex + i),
                     Text = sText,
                     AutoSize = true,
                     Checked = false
@@ -54,6 +61,9 @@ namespace WinFormsCustomControls
         }
         internal CheckBox FirstCheckBoxStringContain(string sText)
         {
+            if (sText == null)
+                throw new ArgumentNullException(nameof(sText));
+
             CheckBox[] arrCheckBox = GetItems;
             foreach (CheckBox checkBox in arrCheckBox)
             {
@@ -64,11 +74,22 @@ namespace WinFormsCustomControls
         }
         internal void ItemClear()
         {
-            vflpMain.Controls.Clear();
+            foreach (Control control in vflpMain.Controls.Cast<Control>().ToArray())
+            {
+                if (control is CheckBox checkBox)
+                    checkBox.CheckedChanged -= CheckBox_CheckedChanged;
+
+                vflpMain.Controls.Remove(control);
+                control.Dispose();
+            }
         }
         private void CheckBox_CheckedChanged(object sender, EventArgs e)
         {
             CheckedChanged?.Invoke(this, e);
+        }
+        private static string CreateCheckBoxName(int index)
+        {
+            return $"cbx{index}";
         }
     }
 }

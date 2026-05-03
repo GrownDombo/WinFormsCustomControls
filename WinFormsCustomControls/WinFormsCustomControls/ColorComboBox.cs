@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Drawing;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace WinFormsCustomControls
@@ -9,6 +8,7 @@ namespace WinFormsCustomControls
     {
         private readonly ColorComboBoxDropdown dropdownPanel;
         private readonly ToolStripDropDown dropDown;
+        private bool isDropDownPending;
         private Color _selectedColor = Color.Red;
         public Color SelectedColor
         {
@@ -46,6 +46,7 @@ namespace WinFormsCustomControls
             };
             dropDown.Closing += dropdown_Closing;
             dropDown.Items.Add(host);
+            components?.Add(dropDown);
         }
         private void ColorComboBoxPanel_ColorSelected(object sender, ColorSelectedEventArgs e)
         {
@@ -57,27 +58,45 @@ namespace WinFormsCustomControls
             if (e.CloseReason == ToolStripDropDownCloseReason.ItemClicked)
                 e.Cancel = true;
         }
-        protected async override void OnClick(EventArgs e)
+        protected override void OnClick(EventArgs e)
         {
-            this.SuspendLayout();
-            await Task.Delay(10);
-            dropDown.Show(this.PointToScreen(new Point(0, this.Height)));
-            dropdownPanel.Focus(); // 포커스를 패널로 줘서 외부 클릭 감지 유도
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            if (isDropDownPending || dropDown.Visible || IsDisposed || Disposing || !IsHandleCreated)
+                return;
+
+            isDropDownPending = true;
+            BeginInvoke(new MethodInvoker(ShowCustomDropDown));
+        }
+        private void ShowCustomDropDown()
+        {
+            isDropDownPending = false;
+
+            if (dropDown.Visible || IsDisposed || Disposing || !IsHandleCreated)
+                return;
+
+            if (DroppedDown)
+                DroppedDown = false;
+
+            dropDown.Show(this, new Point(0, this.Height));
+            if (dropdownPanel.CanFocus)
+                dropdownPanel.Focus(); // 포커스를 패널로 줘서 외부 클릭 감지 유도
         }
         protected override void OnDrawItem(DrawItemEventArgs e)
         {
-            this.SuspendLayout();
             e.DrawBackground(); // 배경 그리기 추가
-            using (Brush brush = new SolidBrush(SelectedColor))
+            Rectangle colorRect = new Rectangle(
+                e.Bounds.X + 2,
+                e.Bounds.Y + 2,
+                Math.Max(0, e.Bounds.Width - 5),
+                Math.Max(0, e.Bounds.Height - 5));
+
+            if (colorRect.Width > 0 && colorRect.Height > 0)
             {
-                Rectangle colorRect = new Rectangle(e.Bounds.X, e.Bounds.Y, e.Bounds.Width - 1, e.Bounds.Height - 1);
-                e.Graphics.FillRectangle(brush, colorRect);
+                using (Brush brush = new SolidBrush(SelectedColor))
+                    e.Graphics.FillRectangle(brush, colorRect);
+
                 e.Graphics.DrawRectangle(Pens.Black, colorRect);
             }
-            this.ResumeLayout(false);
-            this.PerformLayout();
+
         }
     }
 }

@@ -1,4 +1,4 @@
-name: Release
+﻿name: Release
 
 # main 브랜치에 배포 대상 코드가 push될 때마다 이 워크플로를 실행합니다.
 # README나 GitHub 설정처럼 배포 산출물이 바뀌지 않는 경우에는 실행하지 않습니다.
@@ -20,6 +20,7 @@ jobs:
   release:
     name: Build and publish release
     runs-on: windows-latest
+    timeout-minutes: 15
 
     steps:
       # GitHub Actions 실행 환경에 이 저장소의 코드를 내려받습니다.
@@ -37,14 +38,18 @@ jobs:
         shell: pwsh
         run: |
           $assemblyInfoPath = "WinFormsCustomControls\WinFormsCustomControls\Properties\AssemblyInfo.cs"
-          $assemblyInfo = Get-Content -LiteralPath $assemblyInfoPath -Raw
+          $assemblyInfo = Get-Content -LiteralPath $assemblyInfoPath -Raw -Encoding UTF8
           $match = [regex]::Match($assemblyInfo, 'AssemblyFileVersion\("([^"]+)"\)')
 
           if (-not $match.Success) {
             throw "AssemblyFileVersion was not found in $assemblyInfoPath."
           }
 
-          $version = $match.Groups[1].Value
+          $version = $match.Groups[1].Value.Trim()
+          if (-not [regex]::IsMatch($version, '^\d+\.\d+\.\d+\.\d+$')) {
+            throw "AssemblyFileVersion must use a numeric four-part version such as 1.0.0.0."
+          }
+
           $tag = "v$version"
 
           "version=$version" >> $env:GITHUB_OUTPUT
