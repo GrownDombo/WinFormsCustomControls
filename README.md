@@ -1,8 +1,19 @@
 # WinFormsCustomControls
 
+[![Release](https://github.com/GrownDombo/WinFormsCustomControls/actions/workflows/release.yml/badge.svg)](https://github.com/GrownDombo/WinFormsCustomControls/actions/workflows/release.yml)
+
 `.NET Framework 4.8` 기반 WinForms 프로젝트에서 사용할 수 있는 커스텀 컨트롤 DLL입니다.
 
 자주 쓰는 UI 패턴을 WinForms 컨트롤로 묶어 재사용하기 쉽게 만든 라이브러리이며, `WinFormsCustomControls.Demo` 프로젝트에서 각 컨트롤의 동작을 확인할 수 있습니다.
+
+## 다운로드
+
+최신 배포 파일은 [GitHub Releases](https://github.com/GrownDombo/WinFormsCustomControls/releases/latest)에서 받을 수 있습니다.
+
+| 파일 | 용도 |
+| --- | --- |
+| `WinFormsCustomControls-v{version}.zip` | 다른 WinForms 프로젝트에서 참조할 라이브러리 DLL |
+| `WinFormsCustomControls.Demo-v{version}.zip` | 컨트롤 동작을 확인할 수 있는 데모 실행 파일 |
 
 ## 지원 환경
 
@@ -182,3 +193,27 @@ WinFormsCustomControls/WinFormsCustomControls/bin/Release/WinFormsCustomControls
 ```
 
 배포할 때는 이 DLL을 사용하는 WinForms 프로젝트에 참조로 추가하면 됩니다.
+
+### 자동 릴리즈
+
+`main` 브랜치에 배포 대상 코드를 push하면 GitHub Actions가 `AssemblyFileVersion`을 읽어 자동으로 릴리즈를 생성합니다.
+
+```csharp
+[assembly: AssemblyFileVersion("1.0.0.0")]
+```
+
+위 값이면 릴리즈 태그는 `v1.0.0.0`으로 생성됩니다.
+
+자동 릴리즈는 다음 순서로 동작합니다.
+
+1. `AssemblyFileVersion`을 읽어 릴리즈 버전을 결정합니다.
+2. 같은 버전의 태그나 릴리즈가 이미 있으면 배포를 중단합니다.
+3. 솔루션을 Release 구성으로 빌드합니다.
+4. 라이브러리 zip과 데모 zip을 생성합니다.
+5. GitHub Release를 만들고 zip 파일을 업로드합니다.
+
+새 릴리즈를 만들려면 `WinFormsCustomControls/WinFormsCustomControls/Properties/AssemblyInfo.cs`의 `AssemblyFileVersion`을 올린 뒤 `main` 브랜치에 push하면 됩니다.
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.

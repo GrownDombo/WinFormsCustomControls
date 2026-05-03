@@ -1,10 +1,16 @@
 name: Release
 
-# main 브랜치에 커밋이 push될 때마다 이 워크플로를 실행합니다.
+# main 브랜치에 배포 대상 코드가 push될 때마다 이 워크플로를 실행합니다.
+# README나 GitHub 설정처럼 배포 산출물이 바뀌지 않는 경우에는 실행하지 않습니다.
 on:
   push:
     branches:
       - main
+    paths-ignore:
+      - "README.md"
+      - "LICENSE"
+      - "Images/**"
+      - ".github/**"
 
 # GitHub Actions가 GITHUB_TOKEN으로 태그와 릴리즈를 만들 수 있게 권한을 부여합니다.
 permissions:
