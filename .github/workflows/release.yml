@@ -73,6 +73,7 @@ jobs:
           }
 
           Write-Host "Release version $tag is available."
+          exit 0
 
       # 라이브러리 프로젝트와 데모 프로젝트를 Release 구성으로 빌드합니다.
       - name: Build release
