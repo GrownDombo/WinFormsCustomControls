@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace WinFormsCustomControls
@@ -31,6 +33,21 @@ namespace WinFormsCustomControls
             {
                 this.ResumeLayout(false);
                 this.PerformLayout();
+                UpdateScrollMinSize();
+            }
+        }
+        protected override void OnControlRemoved(ControlEventArgs e)
+        {
+            this.SuspendLayout();
+            try
+            {
+                base.OnControlRemoved(e);
+            }
+            finally
+            {
+                this.ResumeLayout(false);
+                this.PerformLayout();
+                UpdateScrollMinSize();
             }
         }
         protected override void OnSizeChanged(EventArgs e)
@@ -46,12 +63,22 @@ namespace WinFormsCustomControls
             {
                 this.ResumeLayout(false);
                 this.PerformLayout();
+                UpdateScrollMinSize();
             }
         }
         private void SetChildWidth(Control control)
         {
             if (control != null)
                 control.Width = Math.Max(0, this.ClientSize.Width - MARGIN);
+        }
+        private void UpdateScrollMinSize()
+        {
+            int height = this.Controls
+                .Cast<Control>()
+                .Where(control => control.Visible)
+                .Sum(control => control.Height + control.Margin.Vertical);
+
+            this.AutoScrollMinSize = new Size(0, height);
         }
     }
 }
